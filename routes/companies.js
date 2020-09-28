@@ -45,12 +45,19 @@ router.post("/", async (req, res, next) => {
 // GET /companies/[handle]
 // This should return a single company found by its id.
 // This should return JSON of {company: companyData}
-
+router.get("/:handle", async (req, res, next) => {
+    try {
+        const company = await Company.getCompany(req.params.handle);
+        return res.json({ company })
+    } catch(e) {
+        return next(e);
+    }
+})
 
 // PATCH /companies/[handle]
 // This should update an existing company and return the updated company.
 // This should return JSON of {company: companyData}
-
+router.get
 
 // DELETE /companies/[handle]
 // This should remove an existing company and return a message.

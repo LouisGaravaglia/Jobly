@@ -53,7 +53,11 @@ class Company {
     }
 
 
-
+    static async getCompany(data){
+        const company = await db.query(`SELECT * FROM companies WHERE handle = $1`, [data]);
+        if (!company.rows[0]) throw new ExpressError("No company exists with that handle", 400);
+        return company.rows;
+    }
 
 
 
