@@ -43,6 +43,5 @@ describe("partialUpdate()", () => {
       const { query, values } = sqlForPartialUpdate("users", {first_name:"UPDATEDfirstname"}, "username", "testusername1") 
     expect(query).toEqual("UPDATE users SET first_name=$1 WHERE username=$2 RETURNING *")
     expect(values).toEqual(["UPDATEDfirstname", "testusername1"])
-    
   });
 });
