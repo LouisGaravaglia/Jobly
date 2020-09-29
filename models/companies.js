@@ -49,10 +49,18 @@ class Company {
         return company.rows;
     }
 
-    static async getCompany(data){
-        const company = await db.query(`SELECT * FROM companies WHERE handle = $1`, [data]);
-        if (!company.rows[0]) throw new ExpressError("No company exists with that handle", 400);
-        return company.rows;
+    static async getCompany(handle){
+        const results = await db.query(`SELECT * FROM companies WHERE handle = $1`, [handle]);
+        const company = results.rows[0];
+        if (!company) throw new ExpressError("No company exists with that handle", 400);
+        const jobs = await db.query(
+            `SELECT id, title, salary, equity
+                  FROM jobs 
+                  WHERE company_handle = $1`,
+            [handle]
+          );
+          company.jobs = jobs.rows;
+        return company;
     }
 
     static async update(handle, data) {

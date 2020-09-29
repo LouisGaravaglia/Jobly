@@ -67,17 +67,33 @@ class Job {
           return job;
     }
 
-//       SELECT
-//       title,
-//       ARRAY_AGG (first_name || ' ' || last_name) actors
-//   FROM
-//       film
-//   INNER JOIN film_actor USING (film_id)
-//   INNER JOIN actor USING (actor_id)
-//   GROUP BY
-//       title
-//   ORDER BY
-//       title;
+    static async update(id, data) {
+      let { query, values } = sqlForPartialUpdate(
+        "jobs",
+        data,
+        "id",
+        id
+      );
+      const result = await db.query(query, values);
+      const job = result.rows[0];
+      if (!job) {
+        throw new ExpressError(`There exists no job with the id of '${id}`, 404);
+      }
+      return job;
+    }
+
+    static async remove(id) {
+      const result = await db.query(
+        `DELETE FROM jobs 
+          WHERE id = $1 
+          RETURNING id`,
+        [id]
+      );
+  
+      if (result.rows.length === 0) {
+        throw new ExpressError(`There exists no job '${id}`, 404);
+      }
+    }
 }
 
 module.exports = Job;
