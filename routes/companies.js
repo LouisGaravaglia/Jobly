@@ -1,10 +1,11 @@
 const express = require("express");
 const router = new express.Router();
 const ExpressError = require("../helpers/expressError");
-const db = require("../db");
 const Company = require("../models/companies");
 const jsonschema = require("jsonschema");
 const companySchema = require("../schemas/companySchema.json");
+const companyUpdateSchema = require("../schemas/companyUpdateSchema.json");
+
 
 
 
@@ -57,12 +58,35 @@ router.get("/:handle", async (req, res, next) => {
 // PATCH /companies/[handle]
 // This should update an existing company and return the updated company.
 // This should return JSON of {company: companyData}
-router.get
+router.patch("/:handle", async (req, res, next) => {
+    try {
+        if ('handle' in req.body) {
+            throw new ExpressError('You are not allowed to change the handle.', 400);
+        }
+        const result = jsonschema.validate(req.body, companyUpdateSchema);
+        if (!result.valid) {
+            const listOfErrors = result.errors.map(e => e.stack);
+            const error = new ExpressError(listOfErrors, 400);
+            return next(error);
+        }
+        const company = await Company.update(req.params.handle, req.body);
+        return res.json({ company })
+    } catch(e) {
+        return next(e);
+    }
+})
 
 // DELETE /companies/[handle]
 // This should remove an existing company and return a message.
 // This should return JSON of {message: "Company deleted"}
-
+router.delete("/:handle", async (req, res, next) => {
+    try {
+        await Company.remove(req.params.handle);
+        return res.json({ message : "Company deleted" })
+    } catch(e) {
+        return next(e);
+    }
+})
 
 
 
