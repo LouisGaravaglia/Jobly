@@ -12,7 +12,7 @@ router.get("/", async (req, res, next) => {
         return res.json({ companies });
     } catch(e) {
         next(e);
-    }  
+    }
 });
 
 router.post("/", async (req, res, next) => {
