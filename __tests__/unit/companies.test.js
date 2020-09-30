@@ -54,11 +54,12 @@ afterAll(async function() {
     await db.end();
 });
 
-describe('GET /companies', async function() {
+describe('GET /companies', function() {
 
-    test('Gets a list of 1 company', async function() {
+    test('Gets a list of all companies', async function() {
         const response = await request(app).get('/companies');
         const companies = response.body.companies;
+        debugger;
         expect(response.statusCode).toBe(200);
         expect(companies).toHaveLength(1);
         expect(companies[0]).toHaveProperty('handle');
@@ -88,7 +89,7 @@ describe('GET /companies', async function() {
 
 });
 
-describe('GET /companies/:handle', async function() {
+describe('GET /companies/:handle', function() {
 
     test('Gets 1 company', async function() {
         const response = await request(app).get('/companies/testcompany');
@@ -98,32 +99,43 @@ describe('GET /companies/:handle', async function() {
     });
 
     test('Responds with 400 if company is not found', async function() {
-        const response = await request(app).get('/companies/nonexistentcompany');
-        expect(response.body.message).toEqual('No company exists with that handle');
-        expect(response.statusCode).toBe(400);
+        try {
+            const response = await request(app).get('/companies/nonexistentcompany');
+            expect(response.body.message).toEqual('No company exists with that handle');
+            expect(response.statusCode).toBe(400);
+        } catch(e) {
+            expect(e.message).toEqual('No company exists with that handle');
+            expect(e.statusCode).toBe(400)
+        }
+        
     });
 
 });
 
-describe('POST /companies', async function() {
+describe('POST /companies', function() {
 
     test('Adds 1 company', async function() {
         const response = await request(app).post('/companies').send({ _token: testUser.userToken, company: { handle: "newtest", name: "newtestcompany", num_employees: 40000 } });
-        console.log(response.body);
         const company = response.body.company[0];
         expect(response.statusCode).toBe(201);
         expect(company).toHaveProperty('handle');
     });
 
     test('Responds with error if company already exists', async function() {
-        const response = await request(app).post('/companies').send({ _token: testUser.userToken, company: { handle: "testcompany", name: "testcompany inc", num_employees: 40000 }});
-        expect(response.body.message).toEqual("There is already a company with that handle");
-        expect(response.statusCode).toBe(400);
+        try{
+            const response = await request(app).post('/companies').send({ _token: testUser.userToken, company: { handle: "testcompany", name: "testcompany inc", num_employees: 40000 }});
+            expect(response.body.message).toEqual("There is already a company with that handle");
+            expect(response.statusCode).toBe(400);
+        } catch(e) {
+            expect(e.message).toEqual("There is already a company with that handle");
+            expect(e.statusCode).toBe(400)
+        }
+
     });
 
 });
 
-describe('PATCH /companies/:handle', async function() {
+describe('PATCH /companies/:handle', function() {
 
     test('Patch 1 company', async function() {
         const response = await request(app).patch('/companies/testcompany').send({ _token: testUser.userToken, name: "newtestcompany", num_employees: 5 });
@@ -133,14 +145,20 @@ describe('PATCH /companies/:handle', async function() {
     });
 
     test('Responds with 404 if company is not found', async function() {
-        const response = await request(app).patch('/companies/nonexistentcompany').send({ _token: testUser.userToken, name: "newtestcompany", num_employees: 5  });
-        expect(response.body.message).toEqual("There exists no company 'nonexistentcompany");
-        expect(response.statusCode).toBe(404);
+        try{
+            const response = await request(app).patch('/companies/nonexistentcompany').send({ _token: testUser.userToken, name: "newtestcompany", num_employees: 5  });
+            expect(response.body.message).toEqual("There exists no company 'nonexistentcompany");
+            expect(response.statusCode).toBe(404);
+        } catch(e){
+            expect(e.message).toEqual("There exists no company 'nonexistentcompany");
+            expect(e.statusCode).toBe(404)
+        }
+
     });
 
 });
 
-describe('DELETE /companies/:handle', async function() {
+describe('DELETE /companies/:handle', function() {
 
   test('Delete 1 company', async function() {
       const response = await request(app).delete('/companies/testcompany').send({ _token: testUser.userToken });
@@ -149,9 +167,15 @@ describe('DELETE /companies/:handle', async function() {
   });
 
   test('Responds with 400 if company is not found', async function() {
-      const response = await request(app).delete('/companies/nonexistentcompany').send({ _token: testUser.userToken });
-      expect(response.body.message).toEqual("No company exists with the handle nonexistentcompany");
-      expect(response.statusCode).toBe(400);
+      try{
+        const response = await request(app).delete('/companies/nonexistentcompany').send({ _token: testUser.userToken });
+        expect(response.body.message).toEqual("No company exists with the handle nonexistentcompany");
+        expect(response.statusCode).toBe(400);
+      } catch(e) {
+        expect(e.message).toEqual("No company exists with the handle nonexistentcompany");
+        expect(e.statusCode).toBe(400)
+      }
+
   });
 
 });

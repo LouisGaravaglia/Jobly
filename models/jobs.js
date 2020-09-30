@@ -48,7 +48,7 @@ class Job {
         );
         const job = jobRes.rows[0];
         if (!job) {
-          throw new ExpressError(`There exists no job '${id}'`, 404);
+          throw new ExpressError(`There exists no job with the id of '${id}'`, 404);
         }
         const companiesRes = await db.query(
           `SELECT name, num_employees, description, logo_url 
@@ -65,7 +65,7 @@ class Job {
         const result = await db.query(query, values);
         const job = result.rows[0];
         if (!job) {
-          throw new ExpressError(`There exists no job with the id of '${id}`, 404);
+          throw new ExpressError(`There exists no job with the id of '${id}'`, 404);
         }
         return job;
     }
@@ -78,7 +78,7 @@ class Job {
             [id]
         );
         if (result.rows.length === 0) {
-            throw new ExpressError(`There exists no job '${id}`, 404);
+            throw new ExpressError(`There exists no job with the id of '${id}'`, 404);
         } 
     };
 
