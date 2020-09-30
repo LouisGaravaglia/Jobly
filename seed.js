@@ -64,6 +64,7 @@ async function seedData() {
     ('test', 2, 'rejected'),
     ('test', 3, 'applied');
   `);
+  
   } catch (err) {
     console.log("Something went wrong!");
     console.log(err);

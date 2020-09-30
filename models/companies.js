@@ -35,7 +35,7 @@ class Company {
         console.log(finalQuery);
         const results = await db.query(finalQuery, queryValues);
         return results.rows
-    }
+    };
 
     static async addCompany(data){
         const duplicateCompany = await db.query(`SELECT * FROM companies WHERE handle = $1`, [data.handle])
@@ -47,7 +47,7 @@ class Company {
                                         RETURNING *`, 
                                         [data.name, data.handle, data.num_employees, data.description, data.logo_url]);
         return company.rows;
-    }
+    };
 
     static async getCompany(handle){
         const results = await db.query(`SELECT * FROM companies WHERE handle = $1`, [handle]);
@@ -61,7 +61,7 @@ class Company {
           );
           company.jobs = jobs.rows;
         return company;
-    }
+    };
 
     static async update(handle, data) {
         let { query, values } = sqlForPartialUpdate(
@@ -76,21 +76,15 @@ class Company {
           throw new ExpressError(`There exists no company '${handle}`, 404);
         }
         return company;
-      }
+    };
 
-      static async remove(handle){
+    static async remove(handle){
         const deleteCompany = await db.query(`DELETE FROM companies WHERE handle = $1 RETURNING *`, [handle])
         if (!deleteCompany.rows[0]) {
             throw new ExpressError(`No company exists with the handle ${handle}`, 400);
         }
-    }
-
+    };
 
 }
 
 module.exports = Company;
-
-// / search. If the query string parameter is passed, a filtered list of handles and names should be displayed based on the search term and if the name includes it.
-// min_employees. If the query string parameter is passed, titles and company handles should be displayed that have a number of employees greater than the value of the query string parameter.
-// max_employees. If the query string parameter is passed, a list of titles and company handles should be displayed that have a number of employees less than the value of the query string parameter.
-// If the min_employees parameter is greater than the max_employees parameter, respond with a 400 status and a message notifying that the parameters are incorrect.
