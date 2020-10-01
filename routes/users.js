@@ -32,9 +32,9 @@ router.post('/', async function(req, res, next) {
         if (!validation.valid) {
         throw new ExpressError(validation.errors.map(e => e.stack), 400);
         }
-        const newUser = await User.register(req.body);
-        const token = createToken(newUser);
-        return res.status(201).json({ token });
+        const user = await User.register(req.body);
+        const token = createToken(user);
+        return res.status(201).json({ user : { user, token } });
     } catch (err) {
         return next(err);
     }

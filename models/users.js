@@ -38,7 +38,7 @@ class User {
         );
         if (duplicateCheck.rows[0]) {
         throw new ExpressError(
-            `There already exists a user with username '${data.username}`,
+            `There already exists a user with username '${data.username}'`,
             400
         );
         }
