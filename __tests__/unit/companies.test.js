@@ -57,7 +57,7 @@ afterAll(async function() {
 describe('GET /companies', function() {
 
     test('Gets a list of all companies', async function() {
-        const response = await request(app).get('/companies');
+        const response = await request(app).get('/companies').send({ _token: testUser.userToken });
         const companies = response.body.companies;
         debugger;
         expect(response.statusCode).toBe(200);
@@ -92,7 +92,7 @@ describe('GET /companies', function() {
 describe('GET /companies/:handle', function() {
 
     test('Gets 1 company', async function() {
-        const response = await request(app).get('/companies/testcompany');
+        const response = await request(app).get('/companies/testcompany').send({ _token: testUser.userToken });
         const company = response.body.company;
         expect(response.statusCode).toBe(200);
         expect(company).toHaveProperty('handle');
@@ -100,7 +100,7 @@ describe('GET /companies/:handle', function() {
 
     test('Responds with 400 if company is not found', async function() {
         try {
-            const response = await request(app).get('/companies/nonexistentcompany');
+            const response = await request(app).get('/companies/nonexistentcompany').send({ _token: testUser.userToken });
             expect(response.body.message).toEqual('No company exists with that handle');
             expect(response.statusCode).toBe(400);
         } catch(e) {

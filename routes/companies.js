@@ -5,8 +5,9 @@ const Company = require("../models/companies");
 const jsonschema = require("jsonschema");
 const companySchema = require("../schemas/companySchema.json");
 const companyUpdateSchema = require("../schemas/companyUpdateSchema.json");
+const { adminRequired, authRequired } = require('../middleware/auth');
 
-router.get("/", async (req, res, next) => {
+router.get("/", authRequired, async (req, res, next) => {
     try {
         companies = await Company.getAllCompanies(req.query);
         return res.json({ companies });
@@ -15,7 +16,7 @@ router.get("/", async (req, res, next) => {
     }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", adminRequired, async (req, res, next) => {
     try {
         const result = jsonschema.validate(req.body, companySchema);
         if (!result.valid) {
@@ -30,7 +31,7 @@ router.post("/", async (req, res, next) => {
     }
 });
 
-router.get("/:handle", async (req, res, next) => {
+router.get("/:handle", authRequired, async (req, res, next) => {
     try {
         const company = await Company.getCompany(req.params.handle);
         return res.json({ company })
@@ -39,7 +40,7 @@ router.get("/:handle", async (req, res, next) => {
     }
 });
 
-router.patch("/:handle", async (req, res, next) => {
+router.patch("/:handle", adminRequired, async (req, res, next) => {
     try {
         if ('handle' in req.body) {
             throw new ExpressError('You are not allowed to change the handle.', 400);
@@ -57,7 +58,7 @@ router.patch("/:handle", async (req, res, next) => {
     }
 });
 
-router.delete("/:handle", async (req, res, next) => {
+router.delete("/:handle", adminRequired, async (req, res, next) => {
     try {
         await Company.remove(req.params.handle);
         return res.json({ message : "Company deleted" })

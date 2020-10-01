@@ -57,7 +57,7 @@ afterAll(async function() {
 describe('GET /jobs', function() {
 
     test('Gets a list of all jobs', async function() {
-        const response = await request(app).get('/jobs');
+        const response = await request(app).get('/jobs').send({ _token: testUser.userToken });
         const jobs = response.body.jobs;
         expect(response.statusCode).toBe(200);
         expect(jobs).toHaveLength(1);
@@ -92,14 +92,14 @@ describe('GET /jobs', function() {
 describe('GET /jobs/:id', function() {
 
     test('Gets 1 job', async function() {
-        const response = await request(app).get(`/jobs/${testUser.jobId}`);
+        const response = await request(app).get(`/jobs/${testUser.jobId}`).send({ _token: testUser.userToken });
         const job = response.body.job;
         expect(response.statusCode).toBe(200);
         expect(job).toHaveProperty('title');
     });
 
     test('Responds with 400 if job is not found', async function() {
-        const response = await request(app).get(`/jobs/0`);
+        const response = await request(app).get(`/jobs/0`).send({ _token: testUser.userToken });
         expect(response.body.message).toEqual("There exists no job with the id of '0'");
         expect(response.statusCode).toBe(404);
     });
