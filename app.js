@@ -1,12 +1,10 @@
 const express = require("express");
 const ExpressError = require("./helpers/expressError");
-const morgan = require("morgan");
 const app = express();
 const companyRoutes = require("./routes/companies");
 const jobRoutes = require("./routes/jobs");
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
-const Company = require("./models/companies");
 
 app.use(express.json());
 

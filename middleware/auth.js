@@ -1,6 +1,18 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const ExpressError = require("../helpers/ExpressError");
+const jsonschema = require("jsonschema");
+
+function validateSchema(schema) {
+  return function validate(req, res, next) {
+    const result = jsonschema.validate(req.body, schema);
+    if (!result.valid) {
+        const listOfErrors = result.errors.map(e => e.stack);
+        const error = new ExpressError(listOfErrors, 400);
+        return next(error);
+    }
+  }
+};
 
 function authRequired(req, res, next) {
   try {
@@ -44,5 +56,6 @@ function ensureCorrectUser(req, res, next) {
 module.exports = {
   authRequired,
   adminRequired,
-  ensureCorrectUser
+  ensureCorrectUser,
+  validateSchema
 };

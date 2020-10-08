@@ -26,7 +26,7 @@ class User {
             return user;
         }
         }
-        throw ExpressError("Invalid Password", 401);
+        throw new ExpressError("Invalid Password", 401);
     };
 
     static async register(data) {
@@ -43,18 +43,20 @@ class User {
         );
         }
         const hashedPassword = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
+        console.log(data.is_admin);
         const result = await db.query(
         `INSERT INTO users 
-            (username, password, first_name, last_name, email, photo_url) 
-            VALUES ($1, $2, $3, $4, $5, $6) 
-            RETURNING username, password, first_name, last_name, email, photo_url`,
+            (username, password, first_name, last_name, email, photo_url, is_admin) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7) 
+            RETURNING username, password, first_name, last_name, email, photo_url, is_admin`,
         [
             data.username,
             hashedPassword,
             data.first_name,
             data.last_name,
             data.email,
-            data.photo_url
+            data.photo_url,
+            data.is_admin
         ]
         );
         return result.rows[0];

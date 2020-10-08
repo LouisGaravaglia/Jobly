@@ -2,19 +2,13 @@ const express = require("express");
 const router = new express.Router();
 const ExpressError = require("../helpers/expressError");
 const Job = require("../models/jobs");
-const jsonschema = require("jsonschema");
 const jobSchema = require("../schemas/jobSchema.json");
 const jobUpdateSchema = require("../schemas/jobUpdateSchema.json");
-const { route } = require("../app");
-const { adminRequired, authRequired } = require('../middleware/auth');
+const { adminRequired, authRequired, validateSchema } = require('../middleware/auth');
 
 router.post("/", adminRequired, async (req, res, next) => {
     try{
-        const results = jsonschema.validate(req.body, jobSchema);
-        if(!results.valid) {
-            const listOfErrors = results.errors.map(e => e.stack)
-            throw new ExpressError (listOfErrors, 400);
-        }
+        validateSchema(jobSchema)
         const newJob = await Job.create(req.body);
         return res.json({ newJob });
     } catch(e) {
@@ -45,11 +39,7 @@ router.patch("/:id", adminRequired, async (req, res, next) => {
         if ('id' in req.body ) {
             throw new ExpressError('You are not allowed to change the ID', 400)
         }
-        const results = jsonschema.validate(req.body, jobUpdateSchema);
-        if(!results.valid){
-            const listOfErrors = results.errors.map(e => e.stack);
-            throw new ExpressError(listOfErrors, 400);
-        }
+        validateSchema(jobUpdateSchema)
         const job = await Job.update(req.params.id, req.body);
         return res.json({ job });
     } catch(e) {

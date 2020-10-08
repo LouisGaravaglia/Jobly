@@ -2,10 +2,9 @@ const express = require("express");
 const router = new express.Router();
 const ExpressError = require("../helpers/expressError");
 const Company = require("../models/companies");
-const jsonschema = require("jsonschema");
 const companySchema = require("../schemas/companySchema.json");
 const companyUpdateSchema = require("../schemas/companyUpdateSchema.json");
-const { adminRequired, authRequired } = require('../middleware/auth');
+const { adminRequired, authRequired, validateSchema } = require('../middleware/auth');
 
 router.get("/", authRequired, async (req, res, next) => {
     try {
@@ -18,12 +17,7 @@ router.get("/", authRequired, async (req, res, next) => {
 
 router.post("/", adminRequired, async (req, res, next) => {
     try {
-        const result = jsonschema.validate(req.body, companySchema);
-        if (!result.valid) {
-            const listOfErrors = result.errors.map(e => e.stack);
-            const error = new ExpressError(listOfErrors, 400);
-            return next(error);
-        }
+        validateSchema(companySchema)
         const company = await Company.addCompany(req.body.company);
         return res.status(201).json({ company });
     } catch(e) {
@@ -45,12 +39,7 @@ router.patch("/:handle", adminRequired, async (req, res, next) => {
         if ('handle' in req.body) {
             throw new ExpressError('You are not allowed to change the handle.', 400);
         }
-        const result = jsonschema.validate(req.body, companyUpdateSchema);
-        if (!result.valid) {
-            const listOfErrors = result.errors.map(e => e.stack);
-            const error = new ExpressError(listOfErrors, 400);
-            return next(error);
-        }
+        validateSchema(companyUpdateSchema)
         const company = await Company.update(req.params.handle, req.body);
         return res.json({ company })
     } catch(e) {

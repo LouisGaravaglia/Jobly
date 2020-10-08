@@ -1,8 +1,7 @@
 const express = require('express');
 const ExpressError = require('../helpers/ExpressError');
-const { ensureCorrectUser, authRequired } = require('../middleware/auth');
+const { ensureCorrectUser, authRequired, validateSchema } = require('../middleware/auth');
 const User = require('../models/users');
-const { validate } = require('jsonschema');
 const userNewSchema = require('../schemas/userNewSchema.json');
 const userUpdateSchema = require('../schemas/userUpdateSchema.json');
 const createToken = require('../helpers/createToken');
@@ -28,10 +27,7 @@ router.get('/:username', authRequired, async function(req, res, next) {
 
 router.post('/', async function(req, res, next) {
     try {
-        const validation = validate(req.body, userNewSchema);
-        if (!validation.valid) {
-        throw new ExpressError(validation.errors.map(e => e.stack), 400);
-        }
+        validateSchema(userNewSchema)
         const user = await User.register(req.body);
         const token = createToken(user);
         return res.status(201).json({ user : { user, token } });
@@ -47,10 +43,7 @@ router.patch('/:username', ensureCorrectUser, async function(req, res, next) {
             'You are not allowed to change username or is_admin properties.',
             400);
         }
-        const validation = validate(req.body, userUpdateSchema);
-        if (!validation.valid) {
-        throw new ExpressError(validation.errors.map(e => e.stack), 400);
-        }
+        validateSchema(userUpdateSchema)
         const user = await User.update(req.params.username, req.body);
         return res.json({ user });
     } catch (err) {
